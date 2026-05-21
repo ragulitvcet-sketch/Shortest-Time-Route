@@ -1,51 +1,80 @@
-#include <stdio.h>
+#include <iostream>
+using namespace std;
 
-#define V 4
-#define INF 9999
+const int SIZE = 5;
+const int INF = 99999;
+
+// Function to find minimum time city
+int findMin(int time[], bool visited[])
+{
+    int min = INF;
+    int index = -1;
+
+    for(int i = 0; i < SIZE; i++)
+    {
+        if(visited[i] == false && time[i] < min)
+        {
+            min = time[i];
+            index = i;
+        }
+    }
+
+    return index;
+}
 
 int main()
 {
-    int graph[V][V] = {
-        {0, 10, 5, 0},
-        {10, 0, 2, 1},
-        {5, 2, 0, 9},
-        {0, 1, 9, 0}
+    // Names of places
+    string city[SIZE] = {"School", "Bus Stand", "Hospital", "Mall", "Railway Station"};
+
+    // Time graph (minutes)
+    int graph[SIZE][SIZE] =
+    {
+        {0, 10, 20, 30, 15},
+        {10, 0, 25, 17, 28},
+        {20, 25, 0, 12, 18},
+        {30, 17, 12, 0, 14},
+        {15, 28, 18, 14, 0}
     };
 
-    int dist[V] = {INF, INF, INF, INF};
-    int visited[V] = {0};
+    int time[SIZE];
+    bool visited[SIZE];
 
-    dist[0] = 0;
-
-    for (int i = 0; i < V - 1; i++)
+    // Initialize
+    for(int i = 0; i < SIZE; i++)
     {
-        int min = INF, u;
+        time[i] = INF;
+        visited[i] = false;
+    }
 
-        for (int j = 0; j < V; j++)
+    int start = 0; // School
+    time[start] = 0;
+
+    // Dijkstra Algorithm
+    for(int count = 0; count < SIZE - 1; count++)
+    {
+        int current = findMin(time, visited);
+
+        visited[current] = true;
+
+        for(int j = 0; j < SIZE; j++)
         {
-            if (!visited[j] && dist[j] < min)
+            if(!visited[j] &&
+               graph[current][j] &&
+               time[current] + graph[current][j] < time[j])
             {
-                min = dist[j];
-                u = j;
-            }
-        }
-
-        visited[u] = 1;
-
-        for (int v = 0; v < V; v++)
-        {
-            if (graph[u][v] && !visited[v] && dist[u] + graph[u][v] < dist[v])
-            {
-                dist[v] = dist[u] + graph[u][v];
+                time[j] = time[current] + graph[current][j];
             }
         }
     }
 
-    printf("Shortest time from source:\n");
+    //Output
+    cout << "Shortest Driving Time from " << city[start] << ":\n\n";
 
-    for (int i = 0; i < V; i++)
+    for(int i = 0; i < SIZE; i++)
     {
-        printf("To %d = %d\n", i, dist[i]);
+        cout << city[start] << " -> " << city[i]
+             << " = " << time[i] << " minutes" << endl;
     }
 
     return 0;
